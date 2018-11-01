@@ -105,6 +105,8 @@ resource "aws_cloudwatch_metric_alarm" "redshift_cpu_alarm_high" {
   evaluation_periods  = 5
   namespace           = "AWS/Redshift"
   metric_name         = "CPUUtilization"
+  alarm_actions       = ["${compact(list(local.alarm_emergency))}"]
+  ok_actions          = ["${compact(list(local.alarm_emergency))}"]
 
   dimensions {
     ClusterIdentifier = "${aws_redshift_cluster.redshift_cluster.id}"
