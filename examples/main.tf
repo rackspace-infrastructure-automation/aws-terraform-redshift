@@ -1,7 +1,6 @@
 provider "aws" {
-  # Temporary workaround for https://github.com/terraform-providers/terraform-provider-aws/issues/6203
-  # version = "~> 1.2, < 1.41.0"
-  region = "eu-west-1"
+  version = "~> 1.2"
+  region  = "eu-west-1"
 }
 
 resource "random_string" "r_string" {
