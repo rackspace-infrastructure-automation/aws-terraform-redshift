@@ -12,7 +12,7 @@ resource "random_string" "r_string" {
 }
 
 module "vpc" {
-  source   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//"
+  source   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=v0.0.6"
   vpc_name = "RedShift-Test-${random_string.r_string.result}"
 }
 
