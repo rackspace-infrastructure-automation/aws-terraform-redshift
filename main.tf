@@ -1,3 +1,46 @@
+/**
+ * # aws-terraform-patch_baseline
+ *
+ *This module creates a redshift cluster and associated route53 record.
+ *
+ *## Basic Usage
+ *
+ *```
+ *module "redshift_test" {
+ * source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.1"
+ * number_of_nodes         = 2
+ * create_route53_record   = true
+ * internal_zone_id        = "${module.internal_zone.internal_hosted_zone_id}"
+ * internal_zone_name      = "${module.internal_zone.internal_hosted_name}"
+ * use_elastic_ip          = true
+ * elastic_ip              = "${aws_eip.redshift_eip.public_ip}"
+ * internal_record_name    = "redshiftendpoint"
+ * publicly_accessible     = true
+ * master_username         = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
+ * master_password         = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
+ * redshift_instance_class = "dc1.large"
+ * environment             = "Development"
+ * enable_rackspace_ticket = true
+ * subnets                 = ["${module.vpc.private_subnets}"]
+ * security_group_list     = ["${module.redshift_sg.redshift_security_group_id}"]
+ * db_name                 = "myredshift"
+ * cluster_type            = "multi-node"
+ * allow_version_upgrade   = true
+ * storage_encrypted       = false
+ * resource_name           = "rs-test-${random_string.r_string.result}"
+ *
+ *   additional_tags = {
+ *     TestTag1 = "TestTag1"
+ *     TestTag2 = "TestTag2"
+ *   }
+ *
+ *   skip_final_snapshot       = true
+ *   final_snapshot_identifier = "MyTestFinalSnapshot"
+ * }
+ *```
+ *
+ * Full working references are available at [examples](examples)
+ */
 locals {
   tags = {
     ServiceProvider = "Rackspace"

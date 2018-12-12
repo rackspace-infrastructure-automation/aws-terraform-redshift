@@ -12,18 +12,18 @@ resource "random_string" "r_string" {
 }
 
 module "vpc" {
-  source   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//"
+  source   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=master"
   vpc_name = "RedShift-Test-${random_string.r_string.result}"
 }
 
 module "redshift_sg" {
-  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=v0.0.5"
+  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=master"
   resource_name = "my_test_sg"
   vpc_id        = "${module.vpc.vpc_id}"
 }
 
 module "internal_zone" {
-  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=v.0.0.1"
+  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=master"
   zone_name     = "example.com"
   environment   = "Development"
   target_vpc_id = "${module.vpc.vpc_id}"
