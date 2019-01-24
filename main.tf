@@ -1,5 +1,5 @@
 /**
- * # aws-terraform-patch_baseline
+ * # aws-terraform-redshift
  *
  *This module creates a redshift cluster and associated route53 record.
  *
@@ -7,7 +7,7 @@
  *
  *```
  *module "redshift_test" {
- * source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.1"
+ * source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.2"
  * number_of_nodes         = 2
  * create_route53_record   = true
  * internal_zone_id        = "${module.internal_zone.internal_hosted_zone_id}"
@@ -46,9 +46,6 @@ locals {
     ServiceProvider = "Rackspace"
     Environment     = "${var.environment}"
   }
-
-  alarm_emergency = "${var.enable_rackspace_ticket ? "arn:aws:sns:${data.aws_region.current_region.name}:${data.aws_caller_identity.current_account.account_id}:rackspace-support-emergency" : ""}"
-  alarm_urgent    = "${var.enable_rackspace_ticket ? "arn:aws:sns:${data.aws_region.current_region.name}:${data.aws_caller_identity.current_account.account_id}:rackspace-support-urgent" : ""}"
 }
 
 data "aws_region" "current_region" {}
@@ -138,57 +135,69 @@ resource "aws_route53_record" "redshift_internal_record_set" {
   ttl     = 300
 }
 
-resource "aws_cloudwatch_metric_alarm" "redshift_cpu_alarm_high" {
-  alarm_name          = "${var.resource_name}-CPUAlarmHigh"
-  alarm_description   = "Alarm if ${aws_redshift_cluster.redshift_cluster.id} CPU > ${var.cw_cpu_threshold}% for 5 minutes"
-  period              = 60
-  comparison_operator = "GreaterThanThreshold"
-  statistic           = "Average"
-  threshold           = "${var.cw_cpu_threshold}"
-  evaluation_periods  = 5
-  namespace           = "AWS/Redshift"
-  metric_name         = "CPUUtilization"
-  alarm_actions       = ["${compact(list(local.alarm_emergency))}"]
-  ok_actions          = ["${compact(list(local.alarm_emergency))}"]
+module "redshift_cpu_alarm_high" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  dimensions {
+  alarm_description        = "Alarm if ${aws_redshift_cluster.redshift_cluster.id} CPU > ${var.cw_cpu_threshold}% for 5 minutes"
+  alarm_name               = "${var.resource_name}-CPUAlarmHigh"
+  comparison_operator      = "GreaterThanThreshold"
+  evaluation_periods       = 5
+  metric_name              = "CPUUtilization"
+  namespace                = "AWS/Redshift"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "urgent"
+  statistic                = "Average"
+  threshold                = "${var.cw_cpu_threshold}"
+
+  dimensions = [{
     ClusterIdentifier = "${aws_redshift_cluster.redshift_cluster.id}"
-  }
+  }]
 }
 
-resource "aws_cloudwatch_metric_alarm" "redshift_cluster_health_Ticket" {
-  alarm_name          = "${var.resource_name}-CluterHealthTicket"
-  alarm_description   = "Cluster has entered unhealthy state, creating ticket"
-  period              = 60
-  comparison_operator = "LessThanThreshold"
-  statistic           = "Average"
-  threshold           = 1
-  evaluation_periods  = 5
-  namespace           = "AWS/Redshift"
-  metric_name         = "HealthStatus"
-  alarm_actions       = ["${compact(list(local.alarm_emergency))}"]
-  ok_actions          = ["${compact(list(local.alarm_emergency))}"]
+module "redshift_cluster_health_Ticket" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  dimensions {
+  alarm_description        = "Cluster has entered unhealthy state, creating ticket"
+  alarm_name               = "${var.resource_name}-CluterHealthTicket"
+  comparison_operator      = "LessThanThreshold"
+  evaluation_periods       = 5
+  metric_name              = "HealthStatus"
+  namespace                = "AWS/Redshift"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "emergency"
+  statistic                = "Average"
+  threshold                = 1
+
+  dimensions = [{
     ClusterIdentifier = "${aws_redshift_cluster.redshift_cluster.id}"
-  }
+  }]
 }
 
-resource "aws_cloudwatch_metric_alarm" "redshift_free_storage_space_ticket" {
-  alarm_name          = "${var.resource_name}-FreeStorageSpaceTicket"
-  alarm_description   = "Consumed storage space has risen above threshold, sending email notification"
-  period              = 60
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  statistic           = "Average"
-  threshold           = "${var.cw_percentage_disk_used}"
-  evaluation_periods  = 30
-  namespace           = "AWS/Redshift"
-  metric_name         = "PercentageDiskSpaceUsed"
-  unit                = "Percent"
-  alarm_actions       = ["${compact(list(local.alarm_urgent))}"]
-  ok_actions          = ["${compact(list(local.alarm_urgent))}"]
+module "redshift_free_storage_space_ticket" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  dimensions {
+  alarm_description        = "Consumed storage space has risen above threshold, sending email notification"
+  alarm_name               = "${var.resource_name}-FreeStorageSpaceTicket"
+  comparison_operator      = "GreaterThanOrEqualToThreshold"
+  evaluation_periods       = 30
+  metric_name              = "PercentageDiskSpaceUsed"
+  namespace                = "AWS/Redshift"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "urgent"
+  statistic                = "Average"
+  threshold                = "${var.cw_percentage_disk_used}"
+  unit                     = "Percent"
+
+  dimensions = [{
     ClusterIdentifier = "${aws_redshift_cluster.redshift_cluster.id}"
-  }
+  }]
 }

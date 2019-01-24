@@ -48,27 +48,27 @@ resource "random_string" "password_string" {
 }
 
 module "redshift_test" {
-  source                  = "../../module"
-  number_of_nodes         = 2
-  create_route53_record   = true
-  internal_zone_id        = "${module.internal_zone.internal_hosted_zone_id}"
-  internal_zone_name      = "${module.internal_zone.internal_hosted_name}"
-  use_elastic_ip          = true
-  elastic_ip              = "${aws_eip.redshift_eip.public_ip}"
-  internal_record_name    = "redshiftendpoint"
-  publicly_accessible     = true
-  master_username         = "${random_string.username_string.result}"
-  master_password         = "${random_string.password_string.result}"
-  redshift_instance_class = "dc1.large"
-  environment             = "Development"
-  enable_rackspace_ticket = true
-  subnets                 = ["${module.vpc.private_subnets}"]
-  security_group_list     = ["${module.redshift_sg.redshift_security_group_id}"]
-  db_name                 = "myredshift"
-  cluster_type            = "multi-node"
-  allow_version_upgrade   = true
-  storage_encrypted       = false
-  resource_name           = "rs-test-${random_string.r_string.result}"
+  source                   = "../../module"
+  number_of_nodes          = 2
+  create_route53_record    = true
+  internal_zone_id         = "${module.internal_zone.internal_hosted_zone_id}"
+  internal_zone_name       = "${module.internal_zone.internal_hosted_name}"
+  use_elastic_ip           = true
+  elastic_ip               = "${aws_eip.redshift_eip.public_ip}"
+  internal_record_name     = "redshiftendpoint"
+  publicly_accessible      = true
+  master_username          = "${random_string.username_string.result}"
+  master_password          = "${random_string.password_string.result}"
+  redshift_instance_class  = "dc1.large"
+  environment              = "Development"
+  rackspace_alarms_enabled = true
+  subnets                  = ["${module.vpc.private_subnets}"]
+  security_group_list      = ["${module.redshift_sg.redshift_security_group_id}"]
+  db_name                  = "myredshift"
+  cluster_type             = "multi-node"
+  allow_version_upgrade    = true
+  storage_encrypted        = false
+  resource_name            = "rs-test-${random_string.r_string.result}"
 
   additional_tags = {
     TestTag1 = "TestTag1"
