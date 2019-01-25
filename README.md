@@ -1,4 +1,4 @@
-# aws-terraform-patch_baseline
+# aws-terraform-redshift
 
 This module creates a redshift cluster and associated route53 record.
 
@@ -6,7 +6,7 @@ This module creates a redshift cluster and associated route53 record.
 
 ```
 module "redshift_test" {
-source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.1"
+source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.2"
 number_of_nodes         = 2
 create_route53_record   = true
 internal_zone_id        = "${module.internal_zone.internal_hosted_zone_id}"
@@ -57,7 +57,6 @@ Full working references are available at [examples](examples)
 | cw\_percentage\_disk\_used | CloudWatch Percentage of storage consumed threshold | string | `"90"` | no |
 | db\_name | Name of initial Redshift database | string | `"myredshift"` | no |
 | elastic\_ip | The Elastic IP (EIP) address for the cluster (must have publicly accessible enabled) | string | `""` | no |
-| enable\_rackspace\_ticket | Specifies whether alarms will generate Rackspace tickets | string | `"false"` | no |
 | environment | Application environment for which this network is being created. e.g. Development/Production. | string | `"Development"` | no |
 | final\_snapshot\_identifier | If provided, a final snapshot will be created immediately before deleting the cluster. | string | `"myfinalredshiftsnapshot"` | no |
 | internal\_record\_name | Record Name for the new Resource Record in the Internal Hosted Zone | string | `""` | no |
@@ -66,10 +65,13 @@ Full working references are available at [examples](examples)
 | key\_id | The ID of the AWS Key Management Service (AWS KMS) key that you want to use to encrypt data in the cluster | string | `""` | no |
 | master\_password | The master password for the Redshift Instance | string | n/a | yes |
 | master\_username | The name of master user for the Redshift instance | string | n/a | yes |
+| notification\_topic | List of SNS Topic ARNs to use for customer notifications. | list | `<list>` | no |
 | number\_of\_nodes | If ClusterType is single-node, this parameter is ignored. If ClusterType is multi-node, NumberOfNodes must be >= 2. | string | `"1"` | no |
 | port | The port number on which the database accepts connections | string | `"5439"` | no |
 | preferred\_maintenance\_window | The daily time range during which automated backups are created if automated backups are enabled | string | `"Sun:05:00-Sun:07:00"` | no |
 | publicly\_accessible | Indicates whether the Redshift cluster is an Internet-facing cluster | string | `"false"` | no |
+| rackspace\_alarms\_enabled | Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false. | string | `"false"` | no |
+| rackspace\_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `"true"` | no |
 | redshift\_instance\_class | The compute and memory capacity of the nodes within the Redshift cluster | string | `"dc1.large"` | no |
 | redshift\_snapshot\_identifier | The name of the snapshot from which to create a new cluster | string | `""` | no |
 | resource\_name | The name to be used for resources provisioned by this module | string | n/a | yes |

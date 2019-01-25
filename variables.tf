@@ -185,10 +185,22 @@ variable "cw_percentage_disk_used" {
   type        = "string"
 }
 
-variable "enable_rackspace_ticket" {
-  description = "Specifies whether alarms will generate Rackspace tickets"
-  default     = false
+variable "notification_topic" {
+  description = "List of SNS Topic ARNs to use for customer notifications."
+  type        = "list"
+  default     = []
+}
+
+variable "rackspace_managed" {
+  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   type        = "string"
+  default     = true
+}
+
+variable "rackspace_alarms_enabled" {
+  description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
+  type        = "string"
+  default     = false
 }
 
 #<\Cloudwatch vars>
