@@ -59,7 +59,7 @@ data "aws_region" "current_region" {}
 data "aws_caller_identity" "current_account" {}
 
 resource "aws_redshift_subnet_group" "redshift_subnet_group" {
-  name       = "${lower("${var.resource_name}-subnetgroup")}"
+  name       = "${join("-",list(lower(var.resource_name),"subnetgroup"))}"
   subnet_ids = ["${var.subnets}"]
 
   tags = "${merge(
@@ -83,7 +83,6 @@ data "aws_iam_policy_document" "redshift_assume_policy" {
 resource "aws_iam_role" "redshift_role" {
   assume_role_policy = "${data.aws_iam_policy_document.redshift_assume_policy.json}"
   name               = "${var.resource_name}-Role"
-
 }
 
 resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
@@ -95,7 +94,7 @@ resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
 resource "aws_redshift_parameter_group" "redshift_parameter_group" {
   description = "${join("-", list(var.environment, "parametergroup"))}"
   family      = "redshift-${var.cluster_version}"
-  name        = "${lower("${var.resource_name}-parametergroup")}"
+  name        = "${join("-", list(lower(var.resource_name),"parametergroup"))}"
 
   parameter {
     name  = "enable_user_activity_logging"
@@ -107,7 +106,7 @@ resource "aws_redshift_cluster" "redshift_cluster" {
   allow_version_upgrade               = "${var.allow_version_upgrade}"
   automated_snapshot_retention_period = "${var.backup_retention_period}"
   availability_zone                   = "${var.availability_zone}"
-  cluster_identifier                  = "${lower("${var.resource_name}-cluster")}"
+  cluster_identifier                  = "${join("-", list(lower(var.resource_name), "cluster"))}"
   cluster_subnet_group_name           = "${aws_redshift_subnet_group.redshift_subnet_group.name}"
   cluster_type                        = "${var.cluster_type}"
   cluster_version                     = "${var.cluster_version}"

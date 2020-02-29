@@ -79,5 +79,4 @@ module "redshift_test" {
     TestTag1 = "TestTag1"
     TestTag2 = "TestTag2"
   }
-
 }

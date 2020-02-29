@@ -1,4 +1,3 @@
-
 variable "additional_tags" {
   description = "Additional tags to be added to the RedShift module resources"
   type        = "map"
@@ -46,11 +45,13 @@ variable "count_cluster_role_managed_policy_arns" {
   default     = 0
   type        = "string"
 }
+
 variable "create_route53_record" {
   description = "Specifies whether or not to create a route53 CNAME record for the redshift endpoint. internal_zone_id, internal_zone_name, and internal_record_name must be provided if set to true. true or false."
   default     = false
   type        = "string"
 }
+
 variable "cw_cpu_threshold" {
   description = "CloudWatch CPUUtilization Threshold"
   default     = 90
@@ -104,6 +105,7 @@ variable "internal_zone_name" {
   default     = ""
   type        = "string"
 }
+
 variable "key_id" {
   description = "The ID of the AWS Key Management Service (AWS KMS) key that you want to use to encrypt data in the cluster"
   default     = ""
@@ -166,6 +168,7 @@ variable "resource_name" {
   description = "The name to be used for resources provisioned by this module"
   type        = "string"
 }
+
 variable "security_group_list" {
   description = "A list of EC2 security groups to assign to this resource."
   default     = []
@@ -201,9 +204,9 @@ variable "rackspace_alarms_enabled" {
   type        = "string"
   default     = false
 }
+
 variable "rackspace_managed" {
   description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   type        = "string"
   default     = true
 }
-
