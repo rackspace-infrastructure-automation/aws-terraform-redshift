@@ -1,43 +1,44 @@
-/**
+/*
  * # aws-terraform-redshift
  *
- *This module creates a redshift cluster and associated route53 record.
+ * This module creates a redshift cluster and associated route53 record.
  *
- *## Basic Usage
+ * ## Basic Usage
  *
- *```
- *module "redshift_test" {
- * source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.2"
- * number_of_nodes         = 2
- * create_route53_record   = true
- * internal_zone_id        = "${module.internal_zone.internal_hosted_zone_id}"
- * internal_zone_name      = "${module.internal_zone.internal_hosted_name}"
- * use_elastic_ip          = true
- * elastic_ip              = "${aws_eip.redshift_eip.public_ip}"
- * internal_record_name    = "redshiftendpoint"
- * publicly_accessible     = true
- * master_username         = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
- * master_password         = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
- * redshift_instance_class = "dc1.large"
- * environment             = "Development"
- * enable_rackspace_ticket = true
- * subnets                 = ["${module.vpc.private_subnets}"]
- * security_group_list     = ["${module.redshift_sg.redshift_security_group_id}"]
- * db_name                 = "myredshift"
- * cluster_type            = "multi-node"
- * allow_version_upgrade   = true
- * storage_encrypted       = false
- * resource_name           = "rs-test-${random_string.r_string.result}"
+ * ```
+ * module "redshift_test" {
+ *  source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.1.0"
+ *
+ *  allow_version_upgrade     = true
+ *  cluster_type              = "multi-node"
+ *  create_route53_record     = true
+ *  db_name                   = "myredshift"
+ *  elastic_ip                = "${aws_eip.redshift_eip.public_ip}"
+ *  enable_rackspace_ticket   = true
+ *  environment               = "Development"
+ *  final_snapshot_identifier = "MyTestFinalSnapshot"
+ *  number_of_nodes           = 2
+ *  internal_record_name      = "redshiftendpoint"
+ *  internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
+ *  internal_zone_name        = "${module.internal_zone.internal_hosted_name}"
+ *  master_password           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
+ *  master_username           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
+ *  publicly_accessible       = true
+ *  use_elastic_ip            = true
+ *  redshift_instance_class   = "dc1.large"
+ *  resource_name             = "rs-test-${random_string.r_string.result}"
+ *  security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
+ *  skip_final_snapshot       = true
+ *  storage_encrypted         = false
+ *  subnets                   = ["${module.vpc.private_subnets}"]
  *
  *   additional_tags = {
- *     TestTag1 = "TestTag1"
- *     TestTag2 = "TestTag2"
+ *      TestTag1 = "TestTag1"
+ *      TestTag2 = "TestTag2"
  *   }
  *
- *   skip_final_snapshot       = true
- *   final_snapshot_identifier = "MyTestFinalSnapshot"
- * }
- *```
+ *  }
+ * ```
  *
  * Full working references are available at [examples](examples)
  * ## Other TF Modules Used
@@ -46,10 +47,11 @@
  * 	- redshift_cluster_health_Ticket
  * 	- redshift_free_storage_space_ticket
  */
+
 locals {
   tags = {
-    ServiceProvider = "Rackspace"
     Environment     = "${var.environment}"
+    ServiceProvider = "Rackspace"
   }
 }
 
@@ -63,7 +65,7 @@ resource "aws_redshift_subnet_group" "redshift_subnet_group" {
   tags = "${merge(
     local.tags,
     var.additional_tags
-)}"
+  )}"
 }
 
 data "aws_iam_policy_document" "redshift_assume_policy" {
@@ -79,19 +81,21 @@ data "aws_iam_policy_document" "redshift_assume_policy" {
 }
 
 resource "aws_iam_role" "redshift_role" {
-  name               = "${var.resource_name}-Role"
   assume_role_policy = "${data.aws_iam_policy_document.redshift_assume_policy.json}"
+  name               = "${var.resource_name}-Role"
+
 }
 
 resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
-  count      = "${var.count_cluster_role_managed_policy_arns}"
+  count = "${var.count_cluster_role_managed_policy_arns}"
+
   policy_arn = "${element(var.cluster_role_managed_policy_arns, count.index)}"
 }
 
 resource "aws_redshift_parameter_group" "redshift_parameter_group" {
-  name        = "${lower("${var.resource_name}-parametergroup")}"
   description = "${join("-", list(var.environment, "parametergroup"))}"
   family      = "redshift-${var.cluster_version}"
+  name        = "${lower("${var.resource_name}-parametergroup")}"
 
   parameter {
     name  = "enable_user_activity_logging"
@@ -100,44 +104,45 @@ resource "aws_redshift_parameter_group" "redshift_parameter_group" {
 }
 
 resource "aws_redshift_cluster" "redshift_cluster" {
+  allow_version_upgrade               = "${var.allow_version_upgrade}"
+  automated_snapshot_retention_period = "${var.backup_retention_period}"
+  availability_zone                   = "${var.availability_zone}"
   cluster_identifier                  = "${lower("${var.resource_name}-cluster")}"
+  cluster_subnet_group_name           = "${aws_redshift_subnet_group.redshift_subnet_group.name}"
   cluster_type                        = "${var.cluster_type}"
   cluster_version                     = "${var.cluster_version}"
-  availability_zone                   = "${var.availability_zone}"
-  publicly_accessible                 = "${var.publicly_accessible}"
+  cluster_parameter_group_name        = "${aws_redshift_parameter_group.redshift_parameter_group.name}"
+  database_name                       = "${var.db_name}"
   elastic_ip                          = "${var.use_elastic_ip && var.publicly_accessible ? var.elastic_ip : ""}"
+  final_snapshot_identifier           = "${var.final_snapshot_identifier}"
+  encrypted                           = "${var.storage_encrypted}"
+  iam_roles                           = ["${aws_iam_role.redshift_role.arn}"]
+  kms_key_id                          = "${var.key_id}"
   master_username                     = "${var.master_username}"
   master_password                     = "${var.master_password}"
-  encrypted                           = "${var.storage_encrypted}"
-  snapshot_identifier                 = "${var.redshift_snapshot_identifier}"
-  vpc_security_group_ids              = ["${var.security_group_list}"]
-  iam_roles                           = ["${aws_iam_role.redshift_role.arn}"]
-  allow_version_upgrade               = "${var.allow_version_upgrade}"
-  kms_key_id                          = "${var.key_id}"
-  automated_snapshot_retention_period = "${var.backup_retention_period}"
-  preferred_maintenance_window        = "${var.preferred_maintenance_window}"
   node_type                           = "${var.redshift_instance_class}"
-  cluster_parameter_group_name        = "${aws_redshift_parameter_group.redshift_parameter_group.name}"
-  port                                = "${var.port}"
-  database_name                       = "${var.db_name}"
   number_of_nodes                     = "${var.number_of_nodes}"
-  cluster_subnet_group_name           = "${aws_redshift_subnet_group.redshift_subnet_group.name}"
-  final_snapshot_identifier           = "${var.final_snapshot_identifier}"
+  publicly_accessible                 = "${var.publicly_accessible}"
   skip_final_snapshot                 = "${var.skip_final_snapshot}"
+  snapshot_identifier                 = "${var.redshift_snapshot_identifier}"
+  port                                = "${var.port}"
+  preferred_maintenance_window        = "${var.preferred_maintenance_window}"
+  vpc_security_group_ids              = ["${var.security_group_list}"]
 
   tags = "${merge(
     local.tags,
     var.additional_tags
-)}"
+  )}"
 }
 
 resource "aws_route53_record" "redshift_internal_record_set" {
-  count   = "${var.create_route53_record ? 1 : 0}"
+  count = "${var.create_route53_record ? 1 : 0}"
+
   name    = "${var.internal_record_name}.${var.internal_zone_name}"
-  type    = "CNAME"
-  zone_id = "${var.internal_zone_id}"
   records = ["${aws_redshift_cluster.redshift_cluster.endpoint}"]
   ttl     = 300
+  type    = "CNAME"
+  zone_id = "${var.internal_zone_id}"
 }
 
 module "redshift_cpu_alarm_high" {
