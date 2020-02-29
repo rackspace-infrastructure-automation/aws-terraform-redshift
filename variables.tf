@@ -1,22 +1,8 @@
-#<General vars>
+
 variable "additional_tags" {
   description = "Additional tags to be added to the RedShift module resources"
   type        = "map"
   default     = {}
-}
-
-variable "resource_name" {
-  description = "The name to be used for resources provisioned by this module"
-  type        = "string"
-}
-
-#<\General vars>
-
-#<Cluster vars>
-variable "availability_zone" {
-  description = "Availability zone in which to initially provision Redshift."
-  default     = ""
-  type        = "string"
 }
 
 variable "allow_version_upgrade" {
@@ -25,10 +11,22 @@ variable "allow_version_upgrade" {
   type        = "string"
 }
 
+variable "availability_zone" {
+  description = "Availability zone in which to initially provision Redshift."
+  default     = ""
+  type        = "string"
+}
+
 variable "backup_retention_period" {
   description = "The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups"
   default     = 1
   type        = "string"
+}
+
+variable "cluster_role_managed_policy_arns" {
+  description = "A comma delimited list of IAM policy ARNs for the ClusterRole IAM role.  IAM ARNs can be found within the Policies section of the AWS IAM console."
+  default     = []
+  type        = "list"
 }
 
 variable "cluster_type" {
@@ -40,6 +38,28 @@ variable "cluster_type" {
 variable "cluster_version" {
   description = "Redshift Engine Version"
   default     = "1.0"
+  type        = "string"
+}
+
+variable "count_cluster_role_managed_policy_arns" {
+  description = "Count of provided policy ARNs provided as a list into variable cluster_role_managed_policy_arns. Must be provided if policies are being given in variable cluster_role_managed_policy_arns."
+  default     = 0
+  type        = "string"
+}
+variable "create_route53_record" {
+  description = "Specifies whether or not to create a route53 CNAME record for the redshift endpoint. internal_zone_id, internal_zone_name, and internal_record_name must be provided if set to true. true or false."
+  default     = false
+  type        = "string"
+}
+variable "cw_cpu_threshold" {
+  description = "CloudWatch CPUUtilization Threshold"
+  default     = 90
+  type        = "string"
+}
+
+variable "cw_percentage_disk_used" {
+  description = "CloudWatch Percentage of storage consumed threshold"
+  default     = 90
   type        = "string"
 }
 
@@ -55,15 +75,43 @@ variable "elastic_ip" {
   type        = "string"
 }
 
+variable "environment" {
+  description = "Application environment for which this network is being created. e.g. Development/Production."
+  default     = "Development"
+  type        = "string"
+}
+
 variable "final_snapshot_identifier" {
   description = "If provided, a final snapshot will be created immediately before deleting the cluster."
   default     = "myfinalredshiftsnapshot"
   type        = "string"
 }
 
+variable "internal_record_name" {
+  description = "Record Name for the new Resource Record in the Internal Hosted Zone"
+  default     = ""
+  type        = "string"
+}
+
+variable "internal_zone_id" {
+  description = "The Route53 Internal Hosted Zone ID"
+  default     = ""
+  type        = "string"
+}
+
+variable "internal_zone_name" {
+  description = "TLD for Internal Hosted Zone"
+  default     = ""
+  type        = "string"
+}
 variable "key_id" {
   description = "The ID of the AWS Key Management Service (AWS KMS) key that you want to use to encrypt data in the cluster"
   default     = ""
+  type        = "string"
+}
+
+variable "master_password" {
+  description = "The master password for the Redshift Instance"
   type        = "string"
 }
 
@@ -72,9 +120,10 @@ variable "master_username" {
   type        = "string"
 }
 
-variable "master_password" {
-  description = "The master password for the Redshift Instance"
-  type        = "string"
+variable "notification_topic" {
+  description = "List of SNS Topic ARNs to use for customer notifications."
+  type        = "list"
+  default     = []
 }
 
 variable "number_of_nodes" {
@@ -113,6 +162,10 @@ variable "redshift_snapshot_identifier" {
   type        = "string"
 }
 
+variable "resource_name" {
+  description = "The name to be used for resources provisioned by this module"
+  type        = "string"
+}
 variable "security_group_list" {
   description = "A list of EC2 security groups to assign to this resource."
   default     = []
@@ -143,86 +196,14 @@ variable "use_elastic_ip" {
   type        = "string"
 }
 
-#<\Cluster vars>
-
-#<Route53 vars>
-variable "create_route53_record" {
-  description = "Specifies whether or not to create a route53 CNAME record for the redshift endpoint. internal_zone_id, internal_zone_name, and internal_record_name must be provided if set to true. true or false."
-  default     = false
-  type        = "string"
-}
-
-variable "internal_record_name" {
-  description = "Record Name for the new Resource Record in the Internal Hosted Zone"
-  default     = ""
-  type        = "string"
-}
-
-variable "internal_zone_name" {
-  description = "TLD for Internal Hosted Zone"
-  default     = ""
-  type        = "string"
-}
-
-variable "internal_zone_id" {
-  description = "The Route53 Internal Hosted Zone ID"
-  default     = ""
-  type        = "string"
-}
-
-#<\Route53 vars>
-
-#<Cloudwatch vars>
-variable "cw_cpu_threshold" {
-  description = "CloudWatch CPUUtilization Threshold"
-  default     = 90
-  type        = "string"
-}
-
-variable "cw_percentage_disk_used" {
-  description = "CloudWatch Percentage of storage consumed threshold"
-  default     = 90
-  type        = "string"
-}
-
-variable "notification_topic" {
-  description = "List of SNS Topic ARNs to use for customer notifications."
-  type        = "list"
-  default     = []
-}
-
-variable "rackspace_managed" {
-  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
-  type        = "string"
-  default     = true
-}
-
 variable "rackspace_alarms_enabled" {
   description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
   type        = "string"
   default     = false
 }
-
-#<\Cloudwatch vars>
-
-variable "environment" {
-  description = "Application environment for which this network is being created. e.g. Development/Production."
-  default     = "Development"
+variable "rackspace_managed" {
+  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   type        = "string"
+  default     = true
 }
-
-#<IAM vars>
-variable "cluster_role_managed_policy_arns" {
-  description = "A comma delimited list of IAM policy ARNs for the ClusterRole IAM role.  IAM ARNs can be found within the Policies section of the AWS IAM console."
-  default     = []
-  type        = "list"
-}
-
-variable "count_cluster_role_managed_policy_arns" {
-  description = "Count of provided policy ARNs provided as a list into variable cluster_role_managed_policy_arns. Must be provided if policies are being given in variable cluster_role_managed_policy_arns."
-  default     = 0
-  type        = "string"
-}
-
-#<\IAM vars>
 
