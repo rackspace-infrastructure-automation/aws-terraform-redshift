@@ -1,13 +1,14 @@
 variable "additional_tags" {
   description = "Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed."
   default     = {}
-  type        =  map(string)
+  type        = map(string)
+
 }
 
 variable "allow_version_upgrade" {
   description = "Indicates that engine upgrades will be applied automatically to the Redshift cluster during the maintenance window"
   default     = true
-  type        = string
+  type        = bool
 }
 
 variable "availability_zone" {
@@ -19,7 +20,7 @@ variable "availability_zone" {
 variable "backup_retention_period" {
   description = "The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups"
   default     = 1
-  type        = string
+  type        = number
 }
 
 variable "cluster_role_managed_policy_arns" {
@@ -43,25 +44,25 @@ variable "cluster_version" {
 variable "count_cluster_role_managed_policy_arns" {
   description = "Count of provided policy ARNs provided as a list into variable cluster_role_managed_policy_arns. Must be provided if policies are being given in variable cluster_role_managed_policy_arns."
   default     = 0
-  type        = string
+  type        = number
 }
 
 variable "create_route53_record" {
   description = "Specifies whether or not to create a route53 CNAME record for the redshift endpoint. internal_zone_id, internal_zone_name, and internal_record_name must be provided if set to true. true or false."
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "cw_cpu_threshold" {
   description = "CloudWatch CPUUtilization Threshold"
   default     = 90
-  type        = string
+  type        = number
 }
 
 variable "cw_percentage_disk_used" {
   description = "CloudWatch Percentage of storage consumed threshold"
   default     = 90
-  type        = string
+  type        = number
 }
 
 variable "db_name" {
@@ -137,13 +138,13 @@ variable "notification_topic" {
 variable "number_of_nodes" {
   description = "If ClusterType is single-node, this parameter is ignored. If ClusterType is multi-node, NumberOfNodes must be >= 2."
   default     = 1
-  type        = string
+  type        = number
 }
 
 variable "port" {
   description = "The port number on which the database accepts connections"
   default     = 5439
-  type        = string
+  type        = number
 }
 
 variable "preferred_maintenance_window" {
@@ -155,7 +156,7 @@ variable "preferred_maintenance_window" {
 variable "publicly_accessible" {
   description = "Indicates whether the Redshift cluster is an Internet-facing cluster"
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "redshift_instance_class" {
@@ -179,7 +180,7 @@ variable "resource_name" {
 variable "security_group_list" {
   description = "A list of EC2 security groups to assign to this resource. [**Deprecated** in favor of `security_groups`]. It will be removed in future releases. `security_groups` is merged with `security_group_list` until `security_group_list` is removed."
   default     = []
-  type        = "list"
+  type        = list(string)
 }
 
 variable "security_groups" {
@@ -191,13 +192,13 @@ variable "security_groups" {
 variable "skip_final_snapshot" {
   description = "Skip final snapshot before deleting the cluster. true or false."
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "storage_encrypted" {
   description = "Specifies whether the Redshift cluster is encrypted"
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "subnets" {
@@ -209,19 +210,19 @@ variable "subnets" {
 variable "use_elastic_ip" {
   description = "Instruct module to use provided Elastic IP Address"
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "rackspace_alarms_enabled" {
   description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
   default     = false
-  type        = string
+  type        = bool
 }
 
 variable "rackspace_managed" {
   description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   default     = true
-  type        = string
+  type        = bool
 }
 
 variable "tags" {

@@ -7,30 +7,30 @@
  *
  * ```
  * module "redshift_test" {
- *  source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.1.0"
+ *  source                  = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.12.0"
  *
  *  allow_version_upgrade     = true
  *  cluster_type              = "multi-node"
  *  create_route53_record     = true
  *  db_name                   = "myredshift"
- *  elastic_ip                = "${aws_eip.redshift_eip.public_ip}"
+ *  elastic_ip                = aws_eip.redshift_eip.public_ip
  *  enable_rackspace_ticket   = true
  *  environment               = "Development"
  *  final_snapshot_identifier = "MyTestFinalSnapshot"
  *  name                      = "rs-test-${random_string.r_string.result}"
  *  number_of_nodes           = 2
  *  internal_record_name      = "redshiftendpoint"
- *  internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
- *  internal_zone_name        = "${module.internal_zone.internal_hosted_name}"
- *  master_password           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
- *  master_username           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
+ *  internal_zone_id          = module.internal_zone.internal_hosted_zone_id
+ *  internal_zone_name        = module.internal_zone.internal_hosted_name
+ *  master_password           = data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]
+ *  master_username           = data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]
  *  publicly_accessible       = true
  *  use_elastic_ip            = true
  *  redshift_instance_class   = "dc1.large"
- *  security_groups           = ["${module.redshift_sg.redshift_security_group_id}"]
+ *  security_groups           = [module.redshift_sg.redshift_security_group_id]
  *  skip_final_snapshot       = true
  *  storage_encrypted         = false
- *  subnets                   = ["${module.vpc.private_subnets}"]
+ *  subnets                   = module.vpc.private_subnets
  *
  *   tags = {
  *      TestTag1 = "TestTag1"
@@ -113,6 +113,7 @@ resource "aws_iam_role" "redshift_role" {
 resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
   count = var.count_cluster_role_managed_policy_arns
 
+  role       = aws_iam_role.redshift_role.name
   policy_arn = element(var.cluster_role_managed_policy_arns, count.index)
 }
 
@@ -167,7 +168,7 @@ resource "aws_route53_record" "redshift_internal_record_set" {
 }
 
 module "redshift_cpu_alarm_high" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.1"
 
   alarm_description        = "Alarm if ${aws_redshift_cluster.redshift_cluster.id} CPU > ${var.cw_cpu_threshold}% for 5 minutes"
   alarm_name               = "${local.name}-CPUAlarmHigh"
@@ -191,7 +192,7 @@ module "redshift_cpu_alarm_high" {
 }
 
 module "redshift_cluster_health_Ticket" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.1"
 
   alarm_description        = "Cluster has entered unhealthy state, creating ticket"
   alarm_name               = "${local.name}-CluterHealthTicket"
@@ -215,7 +216,7 @@ module "redshift_cluster_health_Ticket" {
 }
 
 module "redshift_free_storage_space_ticket" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.1"
 
   alarm_description        = "Consumed storage space has risen above threshold, sending email notification"
   alarm_name               = "${local.name}-FreeStorageSpaceTicket"
