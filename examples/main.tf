@@ -72,7 +72,7 @@ module "redshift_test" {
   subnets                   = ["${module.vpc.private_subnets}"]
   use_elastic_ip            = true
 
-  additional_tags = {
+  tags = {
     TestTag1 = "TestTag1"
     TestTag2 = "TestTag2"
   }

@@ -75,7 +75,7 @@ module "redshift_test" {
   storage_encrypted        = false
   subnets                  = ["${module.vpc.private_subnets}"]
 
-  additional_tags = {
+  tags = {
     TestTag1 = "TestTag1"
     TestTag2 = "TestTag2"
   }

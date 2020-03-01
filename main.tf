@@ -32,7 +32,7 @@
  *  storage_encrypted         = false
  *  subnets                   = ["${module.vpc.private_subnets}"]
  *
- *   additional_tags = {
+ *   tags = {
  *      TestTag1 = "TestTag1"
  *      TestTag2 = "TestTag2"
  *   }
@@ -46,6 +46,16 @@
  * 	- redshift_cpu_alarm_high
  * 	- redshift_cluster_health_Ticket
  * 	- redshift_free_storage_space_ticket
+ *
+ * ## Module variables
+ *
+ * The following module variables changes have occurred:
+ *
+ * #### Deprecations
+ * - `additional_tags` - marked for deprecation as it no longer meets our standards.
+ *
+ * #### Additions
+ * - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
  */
 
 locals {
@@ -53,6 +63,8 @@ locals {
     Environment     = "${var.environment}"
     ServiceProvider = "Rackspace"
   }
+
+  additional_tags = "${merge(var.additional_tags, var.tags)}"
 }
 
 data "aws_region" "current_region" {}

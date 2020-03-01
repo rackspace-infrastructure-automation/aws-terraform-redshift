@@ -31,7 +31,7 @@ module "redshift_test" {
  storage_encrypted         = false
  subnets                   = ["${module.vpc.private_subnets}"]
 
-  additional_tags = {
+  tags = {
      TestTag1 = "TestTag1"
      TestTag2 = "TestTag2"
   }
@@ -46,6 +46,16 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 	- redshift\_cluster\_health\_Ticket
 	- redshift\_free\_storage\_space\_ticket
 
+## Module variables
+
+The following module variables changes have occurred:
+
+#### Deprecations
+- `additional_tags` - marked for deprecation as it no longer meets our standards.
+
+#### Additions
+- `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
+
 ## Providers
 
 | Name | Version |
@@ -56,7 +66,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
-| additional\_tags | Additional tags to be added to the RedShift module resources | `map` | `{}` | no |
+| additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `addtional_tags` is removed. | `map` | `{}` | no |
 | allow\_version\_upgrade | Indicates that engine upgrades will be applied automatically to the Redshift cluster during the maintenance window | `string` | `true` | no |
 | availability\_zone | Availability zone in which to initially provision Redshift. | `string` | `""` | no |
 | backup\_retention\_period | The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups | `string` | `1` | no |
@@ -91,6 +101,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | skip\_final\_snapshot | Skip final snapshot before deleting the cluster. true or false. | `string` | `false` | no |
 | storage\_encrypted | Specifies whether the Redshift cluster is encrypted | `string` | `false` | no |
 | subnets | Subnets for use with this Redshift cluster | `list` | `[]` | no |
+| tags | Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `addtional_tags` is removed in a future release. | `map` | `{}` | no |
 | use\_elastic\_ip | Instruct module to use provided Elastic IP Address | `string` | `false` | no |
 
 ## Outputs
