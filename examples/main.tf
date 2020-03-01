@@ -37,7 +37,7 @@ data "aws_kms_secrets" "redshift_credentials" {
 }
 
 module "internal_zone" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=v.0.0.3"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=v0.0.3"
 
   environment   = "Development"
   target_vpc_id = "${module.vpc.vpc_id}"
