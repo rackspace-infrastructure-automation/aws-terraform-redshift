@@ -17,6 +17,7 @@
  *  enable_rackspace_ticket   = true
  *  environment               = "Development"
  *  final_snapshot_identifier = "MyTestFinalSnapshot"
+ *  name                      = "rs-test-${random_string.r_string.result}"
  *  number_of_nodes           = 2
  *  internal_record_name      = "redshiftendpoint"
  *  internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
@@ -26,7 +27,6 @@
  *  publicly_accessible       = true
  *  use_elastic_ip            = true
  *  redshift_instance_class   = "dc1.large"
- *  resource_name             = "rs-test-${random_string.r_string.result}"
  *  security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
  *  skip_final_snapshot       = true
  *  storage_encrypted         = false
@@ -53,12 +53,17 @@
  *
  * #### Deprecations
  * - `additional_tags` - marked for deprecation as it no longer meets our standards.
+ * - `resource_name`  - marked for deprecation as it no longer meets our standards.
  *
  * #### Additions
  * - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
+ * - `name` - introduced as a replacement for `resource_name` to better align with our standards.
  */
 
 locals {
+  # favor name over alarm name if both are set
+  name = "${var.name != "" ? var.name : var.resource_name}"
+
   tags = {
     Environment     = "${var.environment}"
     ServiceProvider = "Rackspace"
@@ -71,7 +76,7 @@ data "aws_region" "current_region" {}
 data "aws_caller_identity" "current_account" {}
 
 resource "aws_redshift_subnet_group" "redshift_subnet_group" {
-  name       = "${join("-",list(lower(var.resource_name),"subnetgroup"))}"
+  name       = "${join("-",list(lower(local.name),"subnetgroup"))}"
   subnet_ids = ["${var.subnets}"]
 
   tags = "${merge(
@@ -94,7 +99,7 @@ data "aws_iam_policy_document" "redshift_assume_policy" {
 
 resource "aws_iam_role" "redshift_role" {
   assume_role_policy = "${data.aws_iam_policy_document.redshift_assume_policy.json}"
-  name               = "${var.resource_name}-Role"
+  name               = "${local.name}-Role"
 }
 
 resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
@@ -106,7 +111,7 @@ resource "aws_iam_role_policy_attachment" "redshift_policy_attach" {
 resource "aws_redshift_parameter_group" "redshift_parameter_group" {
   description = "${join("-", list(var.environment, "parametergroup"))}"
   family      = "redshift-${var.cluster_version}"
-  name        = "${join("-", list(lower(var.resource_name),"parametergroup"))}"
+  name        = "${join("-", list(lower(local.name),"parametergroup"))}"
 
   parameter {
     name  = "enable_user_activity_logging"
@@ -118,7 +123,7 @@ resource "aws_redshift_cluster" "redshift_cluster" {
   allow_version_upgrade               = "${var.allow_version_upgrade}"
   automated_snapshot_retention_period = "${var.backup_retention_period}"
   availability_zone                   = "${var.availability_zone}"
-  cluster_identifier                  = "${join("-", list(lower(var.resource_name), "cluster"))}"
+  cluster_identifier                  = "${join("-", list(lower(local.name), "cluster"))}"
   cluster_subnet_group_name           = "${aws_redshift_subnet_group.redshift_subnet_group.name}"
   cluster_type                        = "${var.cluster_type}"
   cluster_version                     = "${var.cluster_version}"
@@ -160,7 +165,7 @@ module "redshift_cpu_alarm_high" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
   alarm_description        = "Alarm if ${aws_redshift_cluster.redshift_cluster.id} CPU > ${var.cw_cpu_threshold}% for 5 minutes"
-  alarm_name               = "${var.resource_name}-CPUAlarmHigh"
+  alarm_name               = "${local.name}-CPUAlarmHigh"
   comparison_operator      = "GreaterThanThreshold"
   evaluation_periods       = 5
   metric_name              = "CPUUtilization"
@@ -182,7 +187,7 @@ module "redshift_cluster_health_Ticket" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
   alarm_description        = "Cluster has entered unhealthy state, creating ticket"
-  alarm_name               = "${var.resource_name}-CluterHealthTicket"
+  alarm_name               = "${local.name}-CluterHealthTicket"
   comparison_operator      = "LessThanThreshold"
   evaluation_periods       = 5
   metric_name              = "HealthStatus"
@@ -204,7 +209,7 @@ module "redshift_free_storage_space_ticket" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
   alarm_description        = "Consumed storage space has risen above threshold, sending email notification"
-  alarm_name               = "${var.resource_name}-FreeStorageSpaceTicket"
+  alarm_name               = "${local.name}-FreeStorageSpaceTicket"
   comparison_operator      = "GreaterThanOrEqualToThreshold"
   evaluation_periods       = 30
   metric_name              = "PercentageDiskSpaceUsed"

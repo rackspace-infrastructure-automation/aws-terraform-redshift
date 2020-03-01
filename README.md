@@ -16,6 +16,7 @@ module "redshift_test" {
  enable_rackspace_ticket   = true
  environment               = "Development"
  final_snapshot_identifier = "MyTestFinalSnapshot"
+ name                      = "rs-test-${random_string.r_string.result}"
  number_of_nodes           = 2
  internal_record_name      = "redshiftendpoint"
  internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
@@ -25,7 +26,6 @@ module "redshift_test" {
  publicly_accessible       = true
  use_elastic_ip            = true
  redshift_instance_class   = "dc1.large"
- resource_name             = "rs-test-${random_string.r_string.result}"
  security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
  skip_final_snapshot       = true
  storage_encrypted         = false
@@ -52,9 +52,11 @@ The following module variables changes have occurred:
 
 #### Deprecations
 - `additional_tags` - marked for deprecation as it no longer meets our standards.
+- `resource_name`  - marked for deprecation as it no longer meets our standards.
 
 #### Additions
 - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
+- `name` - introduced as a replacement for `resource_name` to better align with our standards.
 
 ## Providers
 
@@ -87,6 +89,7 @@ The following module variables changes have occurred:
 | key\_id | The ID of the AWS Key Management Service (AWS KMS) key that you want to use to encrypt data in the cluster | `string` | `""` | no |
 | master\_password | The master password for the Redshift Instance | `string` | n/a | yes |
 | master\_username | The name of master user for the Redshift instance | `string` | n/a | yes |
+| name | The name to be used for resources provisioned by this module. Either `name` or `resource_name` **must** contain a non-default value. | `string` | `""` | no |
 | notification\_topic | List of SNS Topic ARNs to use for customer notifications. | `list` | `[]` | no |
 | number\_of\_nodes | If ClusterType is single-node, this parameter is ignored. If ClusterType is multi-node, NumberOfNodes must be >= 2. | `string` | `1` | no |
 | port | The port number on which the database accepts connections | `string` | `5439` | no |
@@ -96,7 +99,7 @@ The following module variables changes have occurred:
 | rackspace\_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | `string` | `true` | no |
 | redshift\_instance\_class | The compute and memory capacity of the nodes within the Redshift cluster | `string` | `"dc1.large"` | no |
 | redshift\_snapshot\_identifier | The name of the snapshot from which to create a new cluster | `string` | `""` | no |
-| resource\_name | The name to be used for resources provisioned by this module | `string` | n/a | yes |
+| resource\_name | The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resourece_name` **must** contain a non-default value.. | `string` | `""` | no |
 | security\_group\_list | A list of EC2 security groups to assign to this resource. | `list` | `[]` | no |
 | skip\_final\_snapshot | Skip final snapshot before deleting the cluster. true or false. | `string` | `false` | no |
 | storage\_encrypted | Specifies whether the Redshift cluster is encrypted | `string` | `false` | no |

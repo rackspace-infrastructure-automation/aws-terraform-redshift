@@ -65,11 +65,11 @@ module "redshift_test" {
   use_elastic_ip           = true
   master_password          = "${random_string.password_string.result}"
   master_username          = "${random_string.username_string.result}"
+  name                     = "rs-test-${random_string.r_string.result}"
   number_of_nodes          = 2
   publicly_accessible      = true
   rackspace_alarms_enabled = true
   redshift_instance_class  = "dc1.large"
-  resource_name            = "rs-test-${random_string.r_string.result}"
   security_group_list      = ["${module.redshift_sg.redshift_security_group_id}"]
   skip_final_snapshot      = true
   storage_encrypted        = false

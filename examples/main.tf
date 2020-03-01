@@ -63,9 +63,9 @@ module "redshift_test" {
   publicly_accessible       = true
   master_username           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
   master_password           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
+  name                      = "rs-test-${random_string.r_string.result}"
   rackspace_alarms_enabled  = true
   redshift_instance_class   = "dc1.large"
-  resource_name             = "rs-test-${random_string.r_string.result}"
   security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
   skip_final_snapshot       = true
   storage_encrypted         = false

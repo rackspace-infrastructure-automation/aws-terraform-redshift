@@ -122,6 +122,12 @@ variable "master_username" {
   type        = "string"
 }
 
+variable "name" {
+  description = "The name to be used for resources provisioned by this module. Either `name` or `resource_name` **must** contain a non-default value."
+  default     = ""
+  type        = "string"
+}
+
 variable "notification_topic" {
   description = "List of SNS Topic ARNs to use for customer notifications."
   type        = "list"
@@ -165,7 +171,8 @@ variable "redshift_snapshot_identifier" {
 }
 
 variable "resource_name" {
-  description = "The name to be used for resources provisioned by this module"
+  description = "The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resourece_name` **must** contain a non-default value.."
+  default     = ""
   type        = "string"
 }
 
