@@ -1,7 +1,7 @@
 variable "additional_tags" {
   description = "Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `addtional_tags` is removed."
-  type        = "map"
   default     = {}
+  type        = "map"
 }
 
 variable "allow_version_upgrade" {
@@ -130,8 +130,8 @@ variable "name" {
 
 variable "notification_topic" {
   description = "List of SNS Topic ARNs to use for customer notifications."
-  type        = "list"
   default     = []
+  type        = "list"
 }
 
 variable "number_of_nodes" {
@@ -208,18 +208,18 @@ variable "use_elastic_ip" {
 
 variable "rackspace_alarms_enabled" {
   description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
-  type        = "string"
   default     = false
+  type        = "string"
 }
 
 variable "rackspace_managed" {
   description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
-  type        = "string"
   default     = true
+  type        = "string"
 }
 
 variable "tags" {
   description = "Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `addtional_tags` is removed in a future release."
-  type        = "map"
   default     = {}
+  type        = "map"
 }
