@@ -70,11 +70,11 @@ The following module variables changes have occurred:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
-| additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed. | `map` | `{}` | no |
+| additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed. | `map(string)` | `{}` | no |
 | allow\_version\_upgrade | Indicates that engine upgrades will be applied automatically to the Redshift cluster during the maintenance window | `string` | `true` | no |
 | availability\_zone | Availability zone in which to initially provision Redshift. | `string` | `""` | no |
 | backup\_retention\_period | The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups | `string` | `1` | no |
-| cluster\_role\_managed\_policy\_arns | A comma delimited list of IAM policy ARNs for the ClusterRole IAM role.  IAM ARNs can be found within the Policies section of the AWS IAM console. | `list` | `[]` | no |
+| cluster\_role\_managed\_policy\_arns | A comma delimited list of IAM policy ARNs for the ClusterRole IAM role.  IAM ARNs can be found within the Policies section of the AWS IAM console. | `list(string)` | `[]` | no |
 | cluster\_type | Create a single-node or multi-node Redshift cluster | `string` | `"single-node"` | no |
 | cluster\_version | Redshift Engine Version | `string` | `"1.0"` | no |
 | count\_cluster\_role\_managed\_policy\_arns | Count of provided policy ARNs provided as a list into variable cluster\_role\_managed\_policy\_arns. Must be provided if policies are being given in variable cluster\_role\_managed\_policy\_arns. | `string` | `0` | no |
@@ -92,7 +92,7 @@ The following module variables changes have occurred:
 | master\_password | The master password for the Redshift Instance | `string` | n/a | yes |
 | master\_username | The name of master user for the Redshift instance | `string` | n/a | yes |
 | name | The name to be used for resources provisioned by this module. Either `name` or `resource_name` **must** contain a non-default value. | `string` | `""` | no |
-| notification\_topic | List of SNS Topic ARNs to use for customer notifications. | `list` | `[]` | no |
+| notification\_topic | List of SNS Topic ARNs to use for customer notifications. | `list(string)` | `[]` | no |
 | number\_of\_nodes | If ClusterType is single-node, this parameter is ignored. If ClusterType is multi-node, NumberOfNodes must be >= 2. | `string` | `1` | no |
 | port | The port number on which the database accepts connections | `string` | `5439` | no |
 | preferred\_maintenance\_window | The daily time range during which automated backups are created if automated backups are enabled | `string` | `"Sun:05:00-Sun:07:00"` | no |
@@ -103,11 +103,11 @@ The following module variables changes have occurred:
 | redshift\_snapshot\_identifier | The name of the snapshot from which to create a new cluster | `string` | `""` | no |
 | resource\_name | The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resource_name` **must** contain a non-default value.. | `string` | `""` | no |
 | security\_group\_list | A list of EC2 security groups to assign to this resource. [**Deprecated** in favor of `security_groups`]. It will be removed in future releases. `security_groups` is merged with `security_group_list` until `security_group_list` is removed. | `list` | `[]` | no |
-| security\_groups | A list of EC2 security groups to assign to this resource. `security_groups` is merged with `security_group_list` until `security_group_list` is removed in a future release. | `list` | `[]` | no |
+| security\_groups | A list of EC2 security groups to assign to this resource. `security_groups` is merged with `security_group_list` until `security_group_list` is removed in a future release. | `list(string)` | `[]` | no |
 | skip\_final\_snapshot | Skip final snapshot before deleting the cluster. true or false. | `string` | `false` | no |
 | storage\_encrypted | Specifies whether the Redshift cluster is encrypted | `string` | `false` | no |
-| subnets | Subnets for use with this Redshift cluster | `list` | `[]` | no |
-| tags | Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `additional_tags` is removed in a future release. | `map` | `{}` | no |
+| subnets | Subnets for use with this Redshift cluster | `list(string)` | `[]` | no |
+| tags | Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `additional_tags` is removed in a future release. | `map(string)` | `{}` | no |
 | use\_elastic\_ip | Instruct module to use provided Elastic IP Address | `string` | `false` | no |
 
 ## Outputs
