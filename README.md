@@ -26,7 +26,7 @@ module "redshift_test" {
  publicly_accessible       = true
  use_elastic_ip            = true
  redshift_instance_class   = "dc1.large"
- security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
+ security_groups           = ["${module.redshift_sg.redshift_security_group_id}"]
  skip_final_snapshot       = true
  storage_encrypted         = false
  subnets                   = ["${module.vpc.private_subnets}"]
@@ -53,10 +53,12 @@ The following module variables changes have occurred:
 #### Deprecations
 - `additional_tags` - marked for deprecation as it no longer meets our standards.
 - `resource_name`  - marked for deprecation as it no longer meets our standards.
+- `security_group_list`  - marked for deprecation as it no longer meets our standards.
 
 #### Additions
 - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
 - `name` - introduced as a replacement for `resource_name` to better align with our standards.
+- `security_groups` - introduced as a replacement for `security_group_list` to better align with our standards.
 
 ## Providers
 
@@ -68,7 +70,7 @@ The following module variables changes have occurred:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
-| additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `addtional_tags` is removed. | `map` | `{}` | no |
+| additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed. | `map` | `{}` | no |
 | allow\_version\_upgrade | Indicates that engine upgrades will be applied automatically to the Redshift cluster during the maintenance window | `string` | `true` | no |
 | availability\_zone | Availability zone in which to initially provision Redshift. | `string` | `""` | no |
 | backup\_retention\_period | The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups | `string` | `1` | no |
@@ -100,11 +102,12 @@ The following module variables changes have occurred:
 | redshift\_instance\_class | The compute and memory capacity of the nodes within the Redshift cluster | `string` | `"dc1.large"` | no |
 | redshift\_snapshot\_identifier | The name of the snapshot from which to create a new cluster | `string` | `""` | no |
 | resource\_name | The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resourece_name` **must** contain a non-default value.. | `string` | `""` | no |
-| security\_group\_list | A list of EC2 security groups to assign to this resource. | `list` | `[]` | no |
+| security\_group\_list | A list of EC2 security groups to assign to this resource. [**Deprecated** in favor of `security_groups`]. It will be removed in future releases. `security_groups` is merged with `security_group_list` until `security_group_list` is removed. | `list` | `[]` | no |
+| security\_groups | A list of EC2 security groups to assign to this resource. `security_groups` is merged with `security_group_list` until `security_group_list` is removed in a future release. | `list` | `[]` | no |
 | skip\_final\_snapshot | Skip final snapshot before deleting the cluster. true or false. | `string` | `false` | no |
 | storage\_encrypted | Specifies whether the Redshift cluster is encrypted | `string` | `false` | no |
 | subnets | Subnets for use with this Redshift cluster | `list` | `[]` | no |
-| tags | Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `addtional_tags` is removed in a future release. | `map` | `{}` | no |
+| tags | Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `additional_tags` is removed in a future release. | `map` | `{}` | no |
 | use\_elastic\_ip | Instruct module to use provided Elastic IP Address | `string` | `false` | no |
 
 ## Outputs

@@ -70,7 +70,7 @@ module "redshift_test" {
   publicly_accessible      = true
   rackspace_alarms_enabled = true
   redshift_instance_class  = "dc1.large"
-  security_group_list      = ["${module.redshift_sg.redshift_security_group_id}"]
+  security_groups          = ["${module.redshift_sg.redshift_security_group_id}"]
   skip_final_snapshot      = true
   storage_encrypted        = false
   subnets                  = ["${module.vpc.private_subnets}"]

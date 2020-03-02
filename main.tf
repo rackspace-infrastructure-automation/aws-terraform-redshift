@@ -27,7 +27,7 @@
  *  publicly_accessible       = true
  *  use_elastic_ip            = true
  *  redshift_instance_class   = "dc1.large"
- *  security_group_list       = ["${module.redshift_sg.redshift_security_group_id}"]
+ *  security_groups           = ["${module.redshift_sg.redshift_security_group_id}"]
  *  skip_final_snapshot       = true
  *  storage_encrypted         = false
  *  subnets                   = ["${module.vpc.private_subnets}"]
@@ -54,10 +54,12 @@
  * #### Deprecations
  * - `additional_tags` - marked for deprecation as it no longer meets our standards.
  * - `resource_name`  - marked for deprecation as it no longer meets our standards.
+* - `security_group_list`  - marked for deprecation as it no longer meets our standards.
  *
  * #### Additions
  * - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
  * - `name` - introduced as a replacement for `resource_name` to better align with our standards.
+ * - `security_groups` - introduced as a replacement for `security_group_list` to better align with our standards.
  */
 
 locals {
@@ -70,6 +72,8 @@ locals {
   }
 
   additional_tags = "${merge(var.additional_tags, var.tags)}"
+
+  security_groups = "${distinct(concat(var.security_groups, var.security_group_list))}"
 }
 
 data "aws_region" "current_region" {}
@@ -143,7 +147,7 @@ resource "aws_redshift_cluster" "redshift_cluster" {
   snapshot_identifier                 = "${var.redshift_snapshot_identifier}"
   port                                = "${var.port}"
   preferred_maintenance_window        = "${var.preferred_maintenance_window}"
-  vpc_security_group_ids              = ["${var.security_group_list}"]
+  vpc_security_group_ids              = ["${local.security_groups}"]
 
   tags = "${merge(
     local.tags,

@@ -1,5 +1,5 @@
 variable "additional_tags" {
-  description = "Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `addtional_tags` is removed."
+  description = "Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed."
   default     = {}
   type        = "map"
 }
@@ -177,7 +177,13 @@ variable "resource_name" {
 }
 
 variable "security_group_list" {
-  description = "A list of EC2 security groups to assign to this resource."
+  description = "A list of EC2 security groups to assign to this resource. [**Deprecated** in favor of `security_groups`]. It will be removed in future releases. `security_groups` is merged with `security_group_list` until `security_group_list` is removed."
+  default     = []
+  type        = "list"
+}
+
+variable "security_groups" {
+  description = "A list of EC2 security groups to assign to this resource. `security_groups` is merged with `security_group_list` until `security_group_list` is removed in a future release."
   default     = []
   type        = "list"
 }
@@ -219,7 +225,7 @@ variable "rackspace_managed" {
 }
 
 variable "tags" {
-  description = "Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `addtional_tags` is removed in a future release."
+  description = "Additional tags to be added to the RedShift module resources. `tags` is merged with `additional_tags` until `additional_tags` is removed in a future release."
   default     = {}
   type        = "map"
 }
