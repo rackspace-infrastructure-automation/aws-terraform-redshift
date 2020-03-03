@@ -3,6 +3,23 @@ provider "aws" {
   region  = "eu-west-1"
 }
 
+# this is for example purposes, please use best practice for secret storage in a production environment
+resource "random_string" "username_string" {
+  length  = 8
+  special = false
+  upper   = false
+  lower   = true
+  number  = false
+}
+
+resource "random_string" "password_string" {
+  length  = 16
+  special = false
+  upper   = true
+  lower   = true
+  number  = true
+}
+
 resource "random_string" "r_string" {
   length  = 6
   upper   = true
@@ -22,18 +39,6 @@ module "redshift_sg" {
 
   resource_name = "my_test_sg"
   vpc_id        = "${module.vpc.vpc_id}"
-}
-
-data "aws_kms_secrets" "redshift_credentials" {
-  secret {
-    name    = "master_username"
-    payload = "AQICAHiMkgli+XMjFjJsKicOEKZDP27c/SlrA4KZAicl3BhO7wF/qrG7hnsXOVymU46FUKydAAAAaDBmBgkqhkiG9w0BBwagWTBXAgEAMFIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMO1xnXU7bNymoyypqAgEQgCUTjRpyQhdU59V69IBYg43wR+JOiNaVZnRm9xwby6th9nK5hQlv"
-  }
-
-  secret {
-    name    = "master_password"
-    payload = "AQICAHiMkgli+XMjFjJsKicOEKZDP27c/SlrA4KZAicl3BhO7wGdlBv+iGhbeKUVUuvGSUZZAAAAaTBnBgkqhkiG9w0BBwagWjBYAgEAMFMGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMirg2/j6IML3SNdpoAgEQgCYQMZxvIeUd2EOKoFKngS/ZTONbWrrXqzImvhXEo94ZoRFmZtXQJQ=="
-  }
 }
 
 module "internal_zone" {
@@ -56,17 +61,17 @@ module "redshift_test" {
   elastic_ip                = "${aws_eip.redshift_eip.public_ip}"
   environment               = "Development"
   final_snapshot_identifier = "MyTestFinalSnapshot"
-  number_of_nodes           = 2
   internal_record_name      = "redshiftendpoint"
   internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
   internal_zone_name        = "${module.internal_zone.internal_hosted_name}"
   publicly_accessible       = true
-  master_username           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
-  master_password           = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
+  master_password           = "${random_string.password_string.result}"
+  master_username           = "${random_string.username_string.result}"
   name                      = "rs-test-${random_string.r_string.result}"
+  number_of_nodes           = 2
   rackspace_alarms_enabled  = true
   redshift_instance_class   = "dc1.large"
-  security_group            = ["${module.redshift_sg.redshift_security_group_id}"]
+  security_groups           = ["${module.redshift_sg.redshift_security_group_id}"]
   skip_final_snapshot       = true
   storage_encrypted         = false
   subnets                   = ["${module.vpc.private_subnets}"]

@@ -171,7 +171,7 @@ variable "redshift_snapshot_identifier" {
 }
 
 variable "resource_name" {
-  description = "The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resourece_name` **must** contain a non-default value.."
+  description = "The name to be used for resources provisioned by this module. [**Deprecated** in favor of `name`]. It will be removed in future releases. `name` supercedes `resource_name` when both are set. Either `name` or `resource_name` **must** contain a non-default value.."
   default     = ""
   type        = "string"
 }
