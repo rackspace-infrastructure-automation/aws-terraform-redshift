@@ -3,6 +3,23 @@ provider "aws" {
   region  = "eu-west-1"
 }
 
+# this is for example purposes, please use best practice for secret storage in a production environment
+resource "random_string" "username_string" {
+  length  = 8
+  special = false
+  upper   = false
+  lower   = true
+  number  = false
+}
+
+resource "random_string" "password_string" {
+  length  = 16
+  special = false
+  upper   = true
+  lower   = true
+  number  = true
+}
+
 resource "random_string" "r_string" {
   length  = 6
   upper   = true
@@ -12,65 +29,56 @@ resource "random_string" "r_string" {
 }
 
 module "vpc" {
-  source   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=v0.0.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=v0.0.10"
+
   vpc_name = "RedShift-Test-${random_string.r_string.result}"
 }
 
 module "redshift_sg" {
-  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=v0.0.5"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=v0.0.6"
+
   resource_name = "my_test_sg"
   vpc_id        = "${module.vpc.vpc_id}"
 }
 
-data "aws_kms_secrets" "redshift_credentials" {
-  secret {
-    name    = "master_username"
-    payload = "AQICAHiMkgli+XMjFjJsKicOEKZDP27c/SlrA4KZAicl3BhO7wF/qrG7hnsXOVymU46FUKydAAAAaDBmBgkqhkiG9w0BBwagWTBXAgEAMFIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMO1xnXU7bNymoyypqAgEQgCUTjRpyQhdU59V69IBYg43wR+JOiNaVZnRm9xwby6th9nK5hQlv"
-  }
-
-  secret {
-    name    = "master_password"
-    payload = "AQICAHiMkgli+XMjFjJsKicOEKZDP27c/SlrA4KZAicl3BhO7wGdlBv+iGhbeKUVUuvGSUZZAAAAaTBnBgkqhkiG9w0BBwagWjBYAgEAMFMGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMirg2/j6IML3SNdpoAgEQgCYQMZxvIeUd2EOKoFKngS/ZTONbWrrXqzImvhXEo94ZoRFmZtXQJQ=="
-  }
-}
-
 module "internal_zone" {
-  source        = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=v.0.0.1"
-  zone_name     = "example.com"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-route53_internal_zone?ref=v0.0.3"
+
   environment   = "Development"
   target_vpc_id = "${module.vpc.vpc_id}"
+  zone_name     = "example.com"
 }
 
 resource "aws_eip" "redshift_eip" {}
 
 module "redshift_test" {
-  source                   = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.0.2"
-  number_of_nodes          = 2
-  create_route53_record    = true
-  internal_zone_id         = "${module.internal_zone.internal_hosted_zone_id}"
-  internal_zone_name       = "${module.internal_zone.internal_hosted_name}"
-  use_elastic_ip           = true
-  elastic_ip               = "${aws_eip.redshift_eip.public_ip}"
-  internal_record_name     = "redshiftendpoint"
-  publicly_accessible      = true
-  master_username          = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_username"]}"
-  master_password          = "${data.aws_kms_secrets.redshift_credentials.plaintext["master_password"]}"
-  redshift_instance_class  = "dc1.large"
-  environment              = "Development"
-  rackspace_alarms_enabled = true
-  subnets                  = ["${module.vpc.private_subnets}"]
-  security_group_list      = ["${module.redshift_sg.redshift_security_group_id}"]
-  db_name                  = "myredshift"
-  cluster_type             = "multi-node"
-  allow_version_upgrade    = true
-  storage_encrypted        = false
-  resource_name            = "rs-test-${random_string.r_string.result}"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-redshift?ref=v0.1.0"
 
-  additional_tags = {
+  allow_version_upgrade     = true
+  cluster_type              = "multi-node"
+  create_route53_record     = true
+  db_name                   = "myredshift"
+  elastic_ip                = "${aws_eip.redshift_eip.public_ip}"
+  environment               = "Development"
+  final_snapshot_identifier = "MyTestFinalSnapshot"
+  internal_record_name      = "redshiftendpoint"
+  internal_zone_id          = "${module.internal_zone.internal_hosted_zone_id}"
+  internal_zone_name        = "${module.internal_zone.internal_hosted_name}"
+  publicly_accessible       = true
+  master_password           = "${random_string.password_string.result}"
+  master_username           = "${random_string.username_string.result}"
+  name                      = "rs-test-${random_string.r_string.result}"
+  number_of_nodes           = 2
+  rackspace_alarms_enabled  = true
+  redshift_instance_class   = "dc1.large"
+  security_groups           = ["${module.redshift_sg.redshift_security_group_id}"]
+  skip_final_snapshot       = true
+  storage_encrypted         = false
+  subnets                   = ["${module.vpc.private_subnets}"]
+  use_elastic_ip            = true
+
+  tags = {
     TestTag1 = "TestTag1"
     TestTag2 = "TestTag2"
   }
-
-  skip_final_snapshot       = true
-  final_snapshot_identifier = "MyTestFinalSnapshot"
 }
