@@ -54,7 +54,7 @@
  * #### Deprecations
  * - `additional_tags` - marked for deprecation as it no longer meets our standards.
  * - `resource_name`  - marked for deprecation as it no longer meets our standards.
-* - `security_group_list`  - marked for deprecation as it no longer meets our standards.
+ * - `security_group_list`  - marked for deprecation as it no longer meets our standards.
  *
  * #### Additions
  * - `tags` - introduced as a replacement for `additional_tags` to better align with our standards.
@@ -65,6 +65,10 @@
 
 terraform {
   required_version = ">= 0.12"
+
+  required_providers {
+    aws = ">= 2.7.0"
+  }
 }
 
 locals {
@@ -191,7 +195,7 @@ module "redshift_cpu_alarm_high" {
   ]
 }
 
-module "redshift_cluster_health_Ticket" {
+module "redshift_cluster_health_ticket" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.1"
 
   alarm_description        = "Cluster has entered unhealthy state, creating ticket"
