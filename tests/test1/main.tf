@@ -48,11 +48,14 @@ resource "random_string" "username_string" {
 }
 
 resource "random_string" "password_string" {
-  length  = 16
-  special = false
-  upper   = true
-  lower   = true
-  number  = true
+  length      = 16
+  lower       = true
+  min_lower   = 1
+  min_numeric = 1
+  min_upper   = 1
+  number      = true
+  special     = false
+  upper       = true
 }
 
 module "redshift_test" {
