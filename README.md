@@ -60,16 +60,45 @@ The following module variables changes have occurred:
 - `name` - introduced as a replacement for `resource_name` to better align with our standards.
 - `security_groups` - introduced as a replacement for `security_group_list` to better align with our standards.
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.7.0 |
+
 ## Providers
 
 | Name | Version |
 |------|---------|
 | aws | >= 2.7.0 |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| redshift_cluster_health_ticket | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+| redshift_cpu_alarm_high | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+| redshift_free_storage_space_ticket | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/caller_identity) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/iam_policy_document) |
+| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/iam_role) |
+| [aws_iam_role_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/iam_role_policy_attachment) |
+| [aws_redshift_cluster](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/redshift_cluster) |
+| [aws_redshift_parameter_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/redshift_parameter_group) |
+| [aws_redshift_subnet_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/redshift_subnet_group) |
+| [aws_region](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/region) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/route53_record) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | additional\_tags | Additional tags to be added to the RedShift module resources. [**Deprecated** in favor of `tags`]. It will be removed in future releases. `tags` is merged with `additional_tags` until `additional_tags` is removed. | `map(string)` | `{}` | no |
 | allow\_version\_upgrade | Indicates that engine upgrades will be applied automatically to the Redshift cluster during the maintenance window | `bool` | `true` | no |
 | availability\_zone | Availability zone in which to initially provision Redshift. | `string` | `""` | no |
@@ -118,4 +147,3 @@ The following module variables changes have occurred:
 | jdbc\_connection\_string | JDBC connection string for cluster |
 | redshift\_address | Address of database endpoint |
 | redshift\_cluster\_identifier | Redshift cluster identifier |
-
