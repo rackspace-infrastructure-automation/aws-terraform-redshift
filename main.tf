@@ -172,7 +172,7 @@ resource "aws_route53_record" "redshift_internal_record_set" {
 }
 
 module "redshift_cpu_alarm_high" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_description        = "Alarm if ${aws_redshift_cluster.redshift_cluster.id} CPU > ${var.cw_cpu_threshold}% for 5 minutes"
   alarm_name               = "${local.name}-CPUAlarmHigh"
@@ -196,7 +196,7 @@ module "redshift_cpu_alarm_high" {
 }
 
 module "redshift_cluster_health_ticket" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_description        = "Cluster has entered unhealthy state, creating ticket"
   alarm_name               = "${local.name}-CluterHealthTicket"
@@ -220,7 +220,7 @@ module "redshift_cluster_health_ticket" {
 }
 
 module "redshift_free_storage_space_ticket" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_description        = "Consumed storage space has risen above threshold, sending email notification"
   alarm_name               = "${local.name}-FreeStorageSpaceTicket"
