@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This project is end of life. This repo will be deleted on June 2nd 2025.
+
 # aws-terraform-redshift
 
 This module creates a redshift cluster and associated route53 record.
